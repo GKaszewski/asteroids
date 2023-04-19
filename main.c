@@ -777,6 +777,8 @@ int main (int argc, char* args[]) {
 	SDL_FreeSurface(background);
 	SDL_FreeSurface(playerHealthSurface);
 
+	bool up = false, down = false, left = false, right = false;
+
 	while (!shouldClose) {
 		SDL_Event e;
 		unsigned now = SDL_GetTicks();
@@ -786,19 +788,19 @@ int main (int argc, char* args[]) {
 				shouldClose = true;
 			}
 
-			if (e.type == SDL_KEYDOWN) {
+			if (e.type == SDL_KEYDOWN && !game->gameOver) {
 				switch (e.key.keysym.sym) {
 					case SDLK_UP:
-						game->player->velY = -game->player->speed;
+						up = true;
 						break;
 					case SDLK_DOWN:
-						game->player->velY = game->player->speed;
+						down = true;
 						break;
 					case SDLK_LEFT:
-						game->player->velX = -game->player->speed;
+						left = true;
 						break;
 					case SDLK_RIGHT:
-						game->player->velX = game->player->speed;
+						right = true;
 						break;
 					case SDLK_SPACE:
 						shoot(game);
@@ -809,16 +811,16 @@ int main (int argc, char* args[]) {
 			if (e.type == SDL_KEYUP) {
 				switch (e.key.keysym.sym) {
 					case SDLK_UP:
-						game->player->velY = 0;
+						up = false;
 						break;
 					case SDLK_DOWN:
-						game->player->velY = 0;
+						down = false;
 						break;
 					case SDLK_LEFT:
-						game->player->velX = 0;
+						left = false;
 						break;
 					case SDLK_RIGHT:
-						game->player->velX = 0;
+						right = false;
 						break;
 				}
 			}
@@ -864,6 +866,31 @@ int main (int argc, char* args[]) {
 		cleanUpEnemyBullets(game);
 		cleanUpSpaceships(game);
 		cleanUpAsteroids(game);
+
+		if (up) {
+			game->player->velY = -game->player->speed;
+		}
+
+		if (down) {
+			game->player->velY = game->player->speed;
+		}
+
+		if (left) {
+			game->player->velX = -game->player->speed;
+		}
+
+		if (right) {
+			game->player->velX = game->player->speed;
+		}
+
+		if (!up && !down) {
+			game->player->velY = 0;
+		}
+
+		if (!left && !right) {
+			game->player->velX = 0;
+		}
+
 		if (!game->gameOver) moveGame(game);
 
 		for (int i = 0; i < MAX_BULLETS; i++) {
